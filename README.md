@@ -1,7 +1,16 @@
-# TODO
+# Instructions
+1. Clone submodules
+2. Install dependencies
+    - Pangolin
+    - Eigen
+    - Boost
+3. Build python bindings
+
+# ToDo
 - [ ] Update CMake configuration and version to build
-- [ ] Update orbslam version
+- [X] Update orbslam version
+- [ ] Patch orbslam for trajectory extraction
 - [ ] Patch gravity value in orbslam
-- [ ] Update pybind11
+- [X] Update pybind11
 - [ ] Add Stereo tracking binding with IMU data
 
