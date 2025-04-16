@@ -84,16 +84,16 @@ bool ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double
     }
 }
 
-bool ORBSLAM3Python::processRGBD(cv::Mat image, cv::Mat depthImage, double timestamp)
+bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, std::vector<ORB_SLAM3::IMU::Point> imuData, double timestamp)
 {
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
         return false;
     }
-    if (image.data && depthImage.data)
+    if (leftImage.data && rightImage.data)
     {
-        auto pose = system->TrackRGBD(image, depthImage, timestamp);
+        auto pose = system->TrackStereo(leftImage, rightImage, imuData, timestamp);
         return !system->isLost();
     }
     else
@@ -145,7 +145,7 @@ PYBIND11_MODULE(orbslam3, m)
         .def("initialize", &ORBSLAM3Python::initialize)
         .def("process_image_mono", &ORBSLAM3Python::processMono, py::arg("image"), py::arg("time_stamp"))
         .def("process_image_stereo", &ORBSLAM3Python::processStereo, py::arg("left_image"), py::arg("right_image"), py::arg("time_stamp"))
-        .def("process_image_rgbd", &ORBSLAM3Python::processRGBD, py::arg("image"), py::arg("depth"), py::arg("time_stamp"))
+        .def("process_image_stereo_imu", &ORBSLAM3Python::processStereoIMU, py::arg("left_image"), py::arg("right_image"), py::arg("imu_data"), py::arg("time_stamp"))
         .def("shutdown", &ORBSLAM3Python::shutdown)
         .def("is_running", &ORBSLAM3Python::isRunning)
         .def("reset", &ORBSLAM3Python::reset)
