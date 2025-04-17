@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 project(Sophus VERSION 1.1.0)
 
 include(CMakePackageConfigHelpers)
@@ -16,11 +16,11 @@ set(CMAKE_CXX_STANDARD 11)
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
    SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g")
    SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra  -Wno-deprecated-register -Qunused-arguments -fcolor-diagnostics")
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wextra  -Wno-deprecated-register -Qunused-arguments -fcolor-diagnostics")
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
    SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g")
    SET(CMAKE_CXX_FLAGS_RELEASE "-O3")
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -std=c++11 -Wno-deprecated-declarations -ftemplate-backtrace-limit=0")
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wextra -std=c++11 -Wno-deprecated-declarations -ftemplate-backtrace-limit=0")
    SET(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} --coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
    SET(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --coverage")
    SET(CMAKE_SHARED_LINKER_FLAGS_COVERAGE "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} --coverage")
@@ -97,14 +97,14 @@ target_compile_features (sophus INTERFACE
 add_custom_target(other SOURCES ${SOPHUS_OTHER_FILES})
 
 # Create 'test' make target using ctest
-option(BUILD_TESTS "Build tests." ON)
+option(BUILD_TESTS "Build tests." OFF)
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
 
 # Create examples make targets using ctest
-option(BUILD_EXAMPLES "Build examples." ON)
+option(BUILD_EXAMPLES "Build examples." OFF)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
