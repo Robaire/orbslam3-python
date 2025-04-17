@@ -15,7 +15,7 @@ public:
     bool initialize();
     bool processMono(cv::Mat image, double timestamp);
     bool processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
-    bool processRGBD(cv::Mat image, cv::Mat depthImage, double timestamp);
+    bool processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData);
     void reset();
     void shutdown();
     bool isRunning();

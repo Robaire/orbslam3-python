@@ -84,7 +84,7 @@ bool ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double
     }
 }
 
-bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, std::vector<ORB_SLAM3::IMU::Point> imuData, double timestamp)
+bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData)
 {
     if (!system)
     {
@@ -93,7 +93,7 @@ bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, std
     }
     if (leftImage.data && rightImage.data)
     {
-        auto pose = system->TrackStereo(leftImage, rightImage, imuData, timestamp);
+        auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData);
         return !system->isLost();
     }
     else
@@ -117,7 +117,8 @@ void ORBSLAM3Python::setUseViewer(bool useViewer)
 
 std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
 {
-    return system->GetCameraTrajectory();
+    //return system->GetCameraTrajectory();
+    return std::vector<Eigen::Matrix4f>();
 }
 
 PYBIND11_MODULE(orbslam3, m)
