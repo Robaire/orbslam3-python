@@ -12,8 +12,8 @@ Based on this [repo](https://github.com/xingruiyang/ORB-SLAM3-python).
 # ToDo
 - [X] Update CMake configuration and version to build
 - [X] Update orbslam version
-- [ ] Patch orbslam for trajectory extraction
-- [ ] Patch gravity value in orbslam
+- [X] Patch orbslam for trajectory extraction
+- [X] Patch gravity value in orbslam
 - [X] Update pybind11
-- [ ] Add Stereo tracking binding with IMU data
+- [X] Add Stereo tracking binding with IMU data
 
