@@ -93,6 +93,7 @@ bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, dou
     }
     if (leftImage.data && rightImage.data)
     {
+        // TODO: Do we want to instead return the pose from this function and have a separate function to check if the system is lost?
         auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData);
         return !system->isLost();
     }
@@ -117,8 +118,14 @@ void ORBSLAM3Python::setUseViewer(bool useViewer)
 
 std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
 {
-    //return system->GetCameraTrajectory();
-    return std::vector<Eigen::Matrix4f>();
+    if (system)
+    {
+            return system->GetCameraTrajectory();
+    }
+    else
+    {
+        return std::vector<Eigen::Matrix4f>();
+    }
 }
 
 PYBIND11_MODULE(orbslam3, m)
@@ -140,6 +147,17 @@ PYBIND11_MODULE(orbslam3, m)
         .value("IMU_MONOCULAR", ORB_SLAM3::System::eSensor::IMU_MONOCULAR)
         .value("IMU_STEREO", ORB_SLAM3::System::eSensor::IMU_STEREO)
         .value("IMU_RGBD", ORB_SLAM3::System::eSensor::IMU_RGBD);
+
+    py::class_<ORB_SLAM3::IMU::Point>(m, "IMUPoint")
+        .def(py::init<const float&, const float&, const float&, 
+                      const float&, const float&, const float&, 
+                      const double&>(),
+             py::arg("acc_x"), py::arg("acc_y"), py::arg("acc_z"),
+             py::arg("ang_vel_x"), py::arg("ang_vel_y"), py::arg("ang_vel_z"),
+             py::arg("timestamp"))
+        .def_readwrite("a", &ORB_SLAM3::IMU::Point::a)
+        .def_readwrite("w", &ORB_SLAM3::IMU::Point::w)
+        .def_readwrite("t", &ORB_SLAM3::IMU::Point::t);
 
     py::class_<ORBSLAM3Python>(m, "system")
         .def(py::init<std::string, std::string, ORB_SLAM3::System::eSensor>(), py::arg("vocab_file"), py::arg("settings_file"), py::arg("sensor_type"))
