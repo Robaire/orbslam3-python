@@ -16,4 +16,4 @@ Based on this [repo](https://github.com/xingruiyang/ORB-SLAM3-python).
 - [X] Patch gravity value in orbslam
 - [X] Update pybind11
 - [X] Add Stereo tracking binding with IMU data
-
+- [ ] Build on MacOS
