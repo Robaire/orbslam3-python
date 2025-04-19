@@ -8,6 +8,8 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
 set(HDRS_DBOW2
   DBoW2/BowVector.h
   DBoW2/FORB.h 
@@ -28,18 +30,10 @@ set(SRCS_DUTILS
   DUtils/Random.cpp
   DUtils/Timestamp.cpp)
 
+find_package(OpenCV 4 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization)
 
-find_package(OpenCV 4 QUIET)
-if(NOT OpenCV_FOUND)
-   find_package(OpenCV 3.0 QUIET)
-   if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 3.0 not found.")
-   endif()
-endif()
-
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-include_directories(${OpenCV_INCLUDE_DIRS})
 add_library(DBoW2 SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
-target_link_libraries(DBoW2 ${OpenCV_LIBS})
 
+target_include_directories(DBoW2 PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(DBoW2 PRIVATE ${OpenCV_LIBS} Boost::serialization)
