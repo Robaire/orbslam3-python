@@ -23,6 +23,7 @@ find_package(Eigen3 3.3.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
 find_package(OpenSSL REQUIRED)
+find_package(GLEW REQUIRED)
 
 add_subdirectory(Thirdparty/DBoW2)
 add_subdirectory(Thirdparty/g2o)
@@ -94,6 +95,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
    ${PROJECT_SOURCE_DIR}/include
    ${PROJECT_SOURCE_DIR}/include/CameraModels
    ${EIGEN3_INCLUDE_DIR}
+   ${PANGOLIN_INCLUDE_DIR}
+   ${GLEW_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
