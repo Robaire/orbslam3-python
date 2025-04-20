@@ -1,8 +1,26 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "cmake>=3.12",
-    "numpy"
+    "numpy",
+    "pybind11",
+    "scikit-build-core"
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "orbslam3"
+version = "0.0.1"
+description = "ORB-SLAM3 Python bindings"
+authors = [
+    { name="Robaire Galliath", email="galliath.robaire@gmail.com" }
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.8"
+
+[tool.scikit-build-core]
+cmake-args = [
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_VERBOSE_MAKEFILE=ON"
+]
+build-dir = "build"
+install-dir = "orbslam3"
