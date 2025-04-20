@@ -26,6 +26,7 @@ RUN apt-get install -y \
     libavdevice-dev \
     python3-dev \
     python3-pip \
+    python3-pybind11 \
     libboost-all-dev \
     libssl-dev
 
