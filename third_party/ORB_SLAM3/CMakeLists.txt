@@ -94,12 +94,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
    ${PROJECT_SOURCE_DIR}/include
    ${PROJECT_SOURCE_DIR}/include/CameraModels
    ${EIGEN3_INCLUDE_DIR}
-   ${Pangolin_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
    ${OpenCV_LIBS}
-   ${EIGEN3_LIBS}
    Eigen3::Eigen
    ${Pangolin_LIBRARIES}
    DBoW2
