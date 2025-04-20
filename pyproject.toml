@@ -18,9 +18,10 @@ readme = "README.md"
 requires-python = ">=3.8"
 
 [tool.scikit-build-core]
-cmake-args = [
-    "-DCMAKE_BUILD_TYPE=Release",
-    "-DCMAKE_VERBOSE_MAKEFILE=ON"
-]
-build-dir = "build"
 install-dir = "orbslam3"
+
+[tool.scikit-build-core.cmake.define]
+SKBUILD = "ON"
+
+[tool.scikit-build-core.sdist]
+include = ["orbslam3/*", "CMakeLists.txt"]
