@@ -21,6 +21,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 find_package(OpenCV 4.4 REQUIRED)
 find_package(Eigen3 3.3.0 REQUIRED)
 find_package(Pangolin REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization)
 
 add_subdirectory(Thirdparty/DBoW2)
 add_subdirectory(Thirdparty/g2o)
@@ -103,5 +104,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
    DBoW2
    g2o
    sophus
+   Boost::serialization
    -lcrypto
 )
