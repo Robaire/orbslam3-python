@@ -6,7 +6,7 @@ PROJECT(g2o)
 SET(g2o_C_FLAGS)
 SET(g2o_CXX_FLAGS)
 
-SET (G2O_LIB_TYPE SHARED)
+SET (G2O_LIB_TYPE STATIC)
 
 # Set the output directory for the build executables and libraries
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -52,7 +52,7 @@ SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 configure_file(config.h.in ${g2o_SOURCE_DIR}/config.h)
 
 # Include the subdirectories
-ADD_LIBRARY(g2o SHARED
+ADD_LIBRARY(g2o STATIC
   #types
   g2o/types/types_sba.h
   g2o/types/types_six_dof_expmap.h
@@ -140,6 +140,9 @@ ADD_LIBRARY(g2o SHARED
   g2o/stuff/property.cpp       
   g2o/stuff/property.h       
 )
+
+# Add position independent code flag for use in shared libraries
+set_property(TARGET g2o PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Set up the top-level include directories
 TARGET_INCLUDE_DIRECTORIES(g2o PRIVATE

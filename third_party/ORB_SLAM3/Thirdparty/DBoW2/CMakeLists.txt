@@ -33,7 +33,8 @@ set(SRCS_DUTILS
 find_package(OpenCV 4 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
 
-add_library(DBoW2 SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
+add_library(DBoW2 STATIC ${SRCS_DBOW2} ${SRCS_DUTILS})
+set_property(TARGET DBoW2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(DBoW2 PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(DBoW2 PRIVATE ${OpenCV_LIBS} Boost::serialization)
