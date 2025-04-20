@@ -6,7 +6,7 @@ LIST(APPEND CMAKE_MODULE_PATH
 )
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 REQUIRED)
 find_package(OpenCV 4.4 REQUIRED)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
