@@ -22,6 +22,7 @@ find_package(OpenCV 4.4 REQUIRED)
 find_package(Eigen3 3.3.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
+find_package(OpenSSL REQUIRED)
 
 add_subdirectory(Thirdparty/DBoW2)
 add_subdirectory(Thirdparty/g2o)
@@ -96,7 +97,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
    ${Pangolin_INCLUDE_DIRS}
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PUBLIC
    ${OpenCV_LIBS}
    ${EIGEN3_LIBS}
    Eigen3::Eigen
@@ -105,5 +106,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
    g2o
    sophus
    Boost::serialization
-   -lcrypto
+   OpenSSL::Crypto
 )
