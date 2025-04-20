@@ -141,9 +141,6 @@ ADD_LIBRARY(g2o STATIC
   g2o/stuff/property.h       
 )
 
-# Add position independent code flag for use in shared libraries
-set_property(TARGET g2o PROPERTY POSITION_INDEPENDENT_CODE ON)
-
 # Set up the top-level include directories
 TARGET_INCLUDE_DIRECTORIES(g2o PRIVATE
   ${g2o_SOURCE_DIR}/core

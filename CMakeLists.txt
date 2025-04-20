@@ -9,9 +9,8 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(OpenCV 4.4 REQUIRED)
 
-# Set the BUILD_SHARED_LIBS variable to OFF before adding the ORB_SLAM3 subdirectory
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
-add_subdirectory(third_party/ORB_SLAM3)
+add_subdirectory(ORB_SLAM3)
 
 # Create the Python module
 pybind11_add_module(orbslam3 
@@ -43,14 +42,6 @@ target_include_directories(orbslam3 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/third_party/ORB_SLAM3/Thirdparty/DBoW2/DBoW2>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/third_party/ORB_SLAM3/Thirdparty/Sophus/sophus>
 )
-
-# We still need RPATH settings for other dependencies like OpenCV
-if(APPLE)
-    set_target_properties(orbslam3 PROPERTIES
-        INSTALL_RPATH "@loader_path;@loader_path/../lib;/usr/local/lib"
-        BUILD_WITH_INSTALL_RPATH TRUE
-    )
-endif()
 
 # Install the main Python module
 install(TARGETS orbslam3 DESTINATION orbslam3)

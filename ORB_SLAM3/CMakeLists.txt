@@ -7,7 +7,7 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -O3")
@@ -19,14 +19,22 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+
 find_package(OpenCV 4.4 REQUIRED)
 find_package(Eigen3 3.3.0 REQUIRED)
-find_package(Pangolin REQUIRED)
 find_package(Boost REQUIRED COMPONENTS serialization)
 find_package(OpenSSL REQUIRED)
-find_package(GLEW REQUIRED)
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+# Add and configure Pangolin
+set(BUILD_TOOLS OFF)
+set(BUILD_EXAMPLES OFF)
+set(BUILD_ASAN OFF)
+set(PANGOLIN_BUILD_TESTS OFF)
+add_subdirectory(Thirdparty/Pangolin)
+
+# Add other third party libraries
 add_subdirectory(Thirdparty/DBoW2)
 add_subdirectory(Thirdparty/g2o)
 add_subdirectory(Thirdparty/Sophus)
@@ -92,24 +100,21 @@ add_library(${PROJECT_NAME} STATIC
    include/Settings.h
 )
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} PUBLIC
+   ${PROJECT_SOURCE_DIR}/..
    ${PROJECT_SOURCE_DIR}
    ${PROJECT_SOURCE_DIR}/include
    ${PROJECT_SOURCE_DIR}/include/CameraModels
    ${EIGEN3_INCLUDE_DIR}
-   ${PANGOLIN_INCLUDE_DIR}
-   ${GLEW_INCLUDE_DIR}
+   ${PROJECT_SOURCE_DIR}/Thirdparty/Pangolin/components/pango_core/include
+   ${PROJECT_SOURCE_DIR}/Thirdparty/Pangolin/components/pango_display/include
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
    ${OpenCV_LIBS}
    Eigen3::Eigen
-   ${Pangolin_LIBRARIES}
-   DBoW2
-   g2o
-   sophus
+   pango_core pango_glgeometry pango_windowing pango_vars pango_plot pango_video
+   DBoW2 g2o sophus
    Boost::serialization
    OpenSSL::Crypto
 )
