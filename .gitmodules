@@ -1,0 +1,3 @@
+[submodule "ORB_SLAM3/Thirdparty/Pangolin"]
+	path = ORB_SLAM3/Thirdparty/Pangolin
+	url = https://github.com/stevenlovegrove/Pangolin.git
