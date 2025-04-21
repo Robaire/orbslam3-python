@@ -32,6 +32,7 @@ set(BUILD_TOOLS OFF)
 set(BUILD_EXAMPLES OFF)
 set(BUILD_ASAN OFF)
 set(PANGOLIN_BUILD_TESTS OFF)
+set(BUILD_PANGOLIN_PYTHON OFF) # Prevent pybind11 from being duplicated
 add_subdirectory(Thirdparty/Pangolin)
 
 # Add other third party libraries
