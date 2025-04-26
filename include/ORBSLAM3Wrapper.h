@@ -14,13 +14,15 @@ public:
     ~ORBSLAM3Python();
 
     bool initialize();
-    bool processMono(cv::Mat image, double timestamp);
+    pybind11::object processMono(cv::Mat image, double timestamp);
     pybind11::object processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
-    bool processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData);
+    pybind11::object processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData);
     void reset();
     void shutdown();
     bool isRunning();
     bool isLost();
+    bool mapChanged();
+    int getTrackingState();
     void setUseViewer(bool useViewer);
     std::vector<Eigen::Matrix4f> getTrajectory() const;
 

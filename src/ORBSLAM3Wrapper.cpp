@@ -57,21 +57,23 @@ void ORBSLAM3Python::reset()
 /// @brief Process a monocular image
 /// @param image The image to process
 /// @param timestamp The timestamp of the image
-/// @return True if the system is not lost, false otherwise
-bool ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
+/// @return The pose of the camera
+py::object ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
 {
     if (!system)
     {
-        return false;
+        std::cout << "you must call initialize() first!" << std::endl;
+        return py::none();
     }
     if (image.data)
     {
-        Sophus::SE3f pose = system->TrackMonocular(image, timestamp);
-        return !system->isLost();
+        auto pose = system->TrackMonocular(image, timestamp);
+        return py::cast(pose.matrix());
     }
     else
     {
-        return false;
+        std::cout << "you must provide an image!" << std::endl;
+        return py::none();
     }
 }
 
@@ -86,7 +88,6 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
     {
         std::cout << "you must call initialize() first!" << std::endl;
         return py::none();
-        // return py::cast(Eigen::Matrix4f::Identity());
     }
     if (leftImage.data && rightImage.data)
     {
@@ -97,7 +98,6 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
     {
         std::cout << "you must provide both left and right images!" << std::endl;
         return py::none();
-        // return py::cast(Eigen::Matrix4f::Identity());
     }
 }
 
@@ -106,23 +106,23 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
 /// @param rightImage The right image
 /// @param timestamp The timestamp of the image
 /// @param imuData The IMU data
-/// @return True if the system is not lost, false otherwise
-bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData)
+/// @return The pose of the camera
+py::object ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData)
 {
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
-        return false;
+        return py::none();
     }
     if (leftImage.data && rightImage.data)
     {
-        // TODO: Do we want to instead return the pose from this function and have a separate function to check if the system is lost?
         auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData);
-        return !system->isLost();
+        return py::cast(pose.matrix());
     }
     else
     {
-        return false;
+        std::cout << "you must provide both left and right images!" << std::endl;
+        return py::none();
     }
 }
 
@@ -146,6 +146,26 @@ void ORBSLAM3Python::shutdown()
     if (system)
     {
         system->Shutdown();
+    }
+}
+
+/// @brief Check if the map has changed
+/// @return True if the map has changed, false otherwise
+bool ORBSLAM3Python::mapChanged()
+{
+    if (system)
+    {
+        return system->MapChanged();
+    }
+}
+
+/// @brief Get the tracking state
+/// @return The tracking state
+int ORBSLAM3Python::getTrackingState()
+{
+    if (system)
+    {
+        return system->GetTrackingState();
     }
 }
 
@@ -211,6 +231,8 @@ PYBIND11_MODULE(orbslam3, m)
         .def("shutdown", &ORBSLAM3Python::shutdown)
         .def("is_running", &ORBSLAM3Python::isRunning)
         .def("is_lost", &ORBSLAM3Python::isLost)
+        .def("map_changed", &ORBSLAM3Python::mapChanged)
+        .def("get_tracking_state", &ORBSLAM3Python::getTrackingState)
         .def("reset", &ORBSLAM3Python::reset);
     // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
     // .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
