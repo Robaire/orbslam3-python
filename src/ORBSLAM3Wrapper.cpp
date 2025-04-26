@@ -3,6 +3,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <Eigen/Dense>
+
 #include <ORB_SLAM3/include/KeyFrame.h>
 #include <ORB_SLAM3/include/Converter.h>
 #include <ORB_SLAM3/include/Tracking.h>
@@ -17,30 +19,33 @@
 
 namespace py = pybind11;
 
+/// @brief Constructor for ORBSLAM3Python
+/// @param vocabFile The path to the vocabulary file
+/// @param settingsFile The path to the settings file
+/// @param sensorMode The sensor mode
 ORBSLAM3Python::ORBSLAM3Python(std::string vocabFile, std::string settingsFile, ORB_SLAM3::System::eSensor sensorMode)
     : vocabluaryFile(vocabFile),
       settingsFile(settingsFile),
       sensorMode(sensorMode),
       system(nullptr),
-      bUseViewer(false)
-{
-}
+      bUseViewer(false) {}
 
-ORBSLAM3Python::~ORBSLAM3Python()
-{
-}
+/// @brief Destructor for ORBSLAM3Python
+ORBSLAM3Python::~ORBSLAM3Python() {}
 
+/// @brief Initialize the ORBSLAM3 system
+/// @return True if the system was initialized successfully, false otherwise
 bool ORBSLAM3Python::initialize()
 {
     system = std::make_shared<ORB_SLAM3::System>(vocabluaryFile, settingsFile, sensorMode, bUseViewer);
     return true;
 }
 
-bool ORBSLAM3Python::isRunning()
-{
-    return system != nullptr;
-}
+/// @brief Check if the system is running
+/// @return True if the system is running, false otherwise
+bool ORBSLAM3Python::isRunning() { return system != nullptr; }
 
+/// @brief Reset the system
 void ORBSLAM3Python::reset()
 {
     if (system)
@@ -49,6 +54,10 @@ void ORBSLAM3Python::reset()
     }
 }
 
+/// @brief Process a monocular image
+/// @param image The image to process
+/// @param timestamp The timestamp of the image
+/// @return True if the system is not lost, false otherwise
 bool ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
 {
     if (!system)
@@ -66,24 +75,38 @@ bool ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
     }
 }
 
-bool ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp)
+/// @brief Process a stereo image
+/// @param leftImage The left image
+/// @param rightImage The right image
+/// @param timestamp The timestamp of the image
+/// @return The pose of the camera
+py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp)
 {
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
-        return false;
+        return py::none();
+        // return py::cast(Eigen::Matrix4f::Identity());
     }
     if (leftImage.data && rightImage.data)
     {
         auto pose = system->TrackStereo(leftImage, rightImage, timestamp);
-        return !system->isLost();
+        return py::cast(pose.matrix());
     }
     else
     {
-        return false;
+        std::cout << "you must provide both left and right images!" << std::endl;
+        return py::none();
+        // return py::cast(Eigen::Matrix4f::Identity());
     }
 }
 
+/// @brief Process a stereo image with IMU data
+/// @param leftImage The left image
+/// @param rightImage The right image
+/// @param timestamp The timestamp of the image
+/// @param imuData The IMU data
+/// @return True if the system is not lost, false otherwise
 bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData)
 {
     if (!system)
@@ -103,6 +126,21 @@ bool ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, dou
     }
 }
 
+/// @brief Check if the system is lost
+/// @return True if lost or uninitialized, false otherwise
+bool ORBSLAM3Python::isLost()
+{
+    if (system)
+    {
+        return system->isLost();
+    }
+    else
+    {
+        return true;
+    }
+}
+
+/// @brief Shutdown the system
 void ORBSLAM3Python::shutdown()
 {
     if (system)
@@ -116,11 +154,16 @@ void ORBSLAM3Python::setUseViewer(bool useViewer)
     bUseViewer = useViewer;
 }
 
+/// @brief Get the camera trajectory
+/// @return A vector of 4x4 matrices representing the camera trajectory
+/// @note This seems to cause a segfault if orbslam loses tracking
 std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
 {
     if (system)
     {
-            return system->GetCameraTrajectory();
+        // TODO: Fix this
+        // return system->GetCameraTrajectory();
+        return std::vector<Eigen::Matrix4f>();
     }
     else
     {
@@ -149,9 +192,9 @@ PYBIND11_MODULE(orbslam3, m)
         .value("IMU_RGBD", ORB_SLAM3::System::eSensor::IMU_RGBD);
 
     py::class_<ORB_SLAM3::IMU::Point>(m, "IMUPoint")
-        .def(py::init<const float&, const float&, const float&, 
-                      const float&, const float&, const float&, 
-                      const double&>(),
+        .def(py::init<const float &, const float &, const float &,
+                      const float &, const float &, const float &,
+                      const double &>(),
              py::arg("acc_x"), py::arg("acc_y"), py::arg("acc_z"),
              py::arg("ang_vel_x"), py::arg("ang_vel_y"), py::arg("ang_vel_z"),
              py::arg("timestamp"))
@@ -167,7 +210,8 @@ PYBIND11_MODULE(orbslam3, m)
         .def("process_image_stereo_imu", &ORBSLAM3Python::processStereoIMU, py::arg("left_image"), py::arg("right_image"), py::arg("time_stamp"), py::arg("imu_data"))
         .def("shutdown", &ORBSLAM3Python::shutdown)
         .def("is_running", &ORBSLAM3Python::isRunning)
-        .def("reset", &ORBSLAM3Python::reset)
-        .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
-        .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
+        .def("is_lost", &ORBSLAM3Python::isLost)
+        .def("reset", &ORBSLAM3Python::reset);
+    // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
+    // .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <System.h>
 #include <Tracking.h>
+#include <pybind11/pybind11.h>
 
 class ORBSLAM3Python
 {
@@ -14,11 +15,12 @@ public:
 
     bool initialize();
     bool processMono(cv::Mat image, double timestamp);
-    bool processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
+    pybind11::object processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
     bool processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData);
     void reset();
     void shutdown();
     bool isRunning();
+    bool isLost();
     void setUseViewer(bool useViewer);
     std::vector<Eigen::Matrix4f> getTrajectory() const;
 
