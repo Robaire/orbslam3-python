@@ -182,8 +182,8 @@ std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
     if (system)
     {
         // TODO: Fix this
-        // return system->GetCameraTrajectory();
-        return std::vector<Eigen::Matrix4f>();
+        return system->GetCameraTrajectory();
+        // return std::vector<Eigen::Matrix4f>();
     }
     else
     {
@@ -233,7 +233,7 @@ PYBIND11_MODULE(orbslam3, m)
         .def("is_lost", &ORBSLAM3Python::isLost)
         .def("map_changed", &ORBSLAM3Python::mapChanged)
         .def("get_tracking_state", &ORBSLAM3Python::getTrackingState)
-        .def("reset", &ORBSLAM3Python::reset);
-    // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
-    // .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
+        .def("reset", &ORBSLAM3Python::reset)
+        // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
+        .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
 }
