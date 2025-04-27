@@ -16,7 +16,7 @@ public:
     bool initialize();
     pybind11::object processMono(cv::Mat image, double timestamp);
     pybind11::object processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp);
-    pybind11::object processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData);
+    pybind11::object processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<std::vector<float>> imuData);
     void reset();
     void shutdown();
     bool isRunning();
@@ -25,6 +25,7 @@ public:
     int getTrackingState();
     void setUseViewer(bool useViewer);
     std::vector<Eigen::Matrix4f> getTrajectory() const;
+    pybind11::object getCurrentPose() const;
 
 private:
     std::string vocabluaryFile;

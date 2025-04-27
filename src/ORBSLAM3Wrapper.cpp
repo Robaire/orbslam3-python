@@ -68,7 +68,8 @@ py::object ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
     if (image.data)
     {
         auto pose = system->TrackMonocular(image, timestamp);
-        return py::cast(pose.matrix());
+        return getCurrentPose();
+        // return py::cast(pose.matrix());
     }
     else
     {
@@ -92,7 +93,8 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
     if (leftImage.data && rightImage.data)
     {
         auto pose = system->TrackStereo(leftImage, rightImage, timestamp);
-        return py::cast(pose.matrix());
+        return getCurrentPose();
+        // return py::cast(pose.matrix());
     }
     else
     {
@@ -107,7 +109,7 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
 /// @param timestamp The timestamp of the image
 /// @param imuData The IMU data
 /// @return The pose of the camera
-py::object ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<ORB_SLAM3::IMU::Point> imuData)
+py::object ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<std::vector<float>> imuData)
 {
     if (!system)
     {
@@ -116,8 +118,34 @@ py::object ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImag
     }
     if (leftImage.data && rightImage.data)
     {
-        auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuData);
-        return py::cast(pose.matrix());
+
+        // Check the imuData vector
+        if (imuData.empty())
+        {
+            std::cout << "you must provide IMU data!" << std::endl;
+            return py::none();
+        }
+
+        // Create a list of ORB_SLAM3::IMU::Point objects
+        std::vector<ORB_SLAM3::IMU::Point> imuDataList;
+
+        // Iterate through the imuData vector and create a list of ORB_SLAM3::IMU::Point objects
+        for (const auto &imuPoint : imuData)
+        {
+            // Check the size of the imuData vector
+            if (imuPoint.size() != 7)
+            {
+                std::cout << "IMU Data must be [acc_x, acc_y, acc_z, ang_vel_x, ang_vel_y, ang_vel_z, timestamp]" << std::endl;
+                return py::none();
+            }
+
+            // Create an ORB_SLAM3::IMU::Point object
+            imuDataList.push_back(ORB_SLAM3::IMU::Point(imuPoint[0], imuPoint[1], imuPoint[2], imuPoint[3], imuPoint[4], imuPoint[5], imuPoint[6]));
+        }
+
+        auto pose = system->TrackStereo(leftImage, rightImage, timestamp, imuDataList);
+        return getCurrentPose();
+        // return py::cast(pose.matrix());
     }
     else
     {
@@ -191,6 +219,25 @@ std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
     }
 }
 
+/// @brief Get the current camera pose
+/// @return The current camera pose
+py::object ORBSLAM3Python::getCurrentPose() const
+{
+    if (system)
+    {
+        std::vector<Eigen::Matrix4f> trajectory = system->GetCameraTrajectory();
+        if (trajectory.empty())
+        {
+            return py::none();
+        }
+        return py::cast(trajectory.back());
+    }
+    else
+    {
+        return py::none();
+    }
+}
+
 PYBIND11_MODULE(orbslam3, m)
 {
     NDArrayConverter::init_numpy();
@@ -211,16 +258,16 @@ PYBIND11_MODULE(orbslam3, m)
         .value("IMU_STEREO", ORB_SLAM3::System::eSensor::IMU_STEREO)
         .value("IMU_RGBD", ORB_SLAM3::System::eSensor::IMU_RGBD);
 
-    py::class_<ORB_SLAM3::IMU::Point>(m, "IMUPoint")
-        .def(py::init<const float &, const float &, const float &,
-                      const float &, const float &, const float &,
-                      const double &>(),
-             py::arg("acc_x"), py::arg("acc_y"), py::arg("acc_z"),
-             py::arg("ang_vel_x"), py::arg("ang_vel_y"), py::arg("ang_vel_z"),
-             py::arg("timestamp"))
-        .def_readwrite("a", &ORB_SLAM3::IMU::Point::a)
-        .def_readwrite("w", &ORB_SLAM3::IMU::Point::w)
-        .def_readwrite("t", &ORB_SLAM3::IMU::Point::t);
+    // py::class_<ORB_SLAM3::IMU::Point>(m, "IMUPoint")
+    //     .def(py::init<const float &, const float &, const float &,
+    //                   const float &, const float &, const float &,
+    //                   const double &>(),
+    //          py::arg("acc_x"), py::arg("acc_y"), py::arg("acc_z"),
+    //          py::arg("ang_vel_x"), py::arg("ang_vel_y"), py::arg("ang_vel_z"),
+    //          py::arg("timestamp"))
+    //     .def_readwrite("a", &ORB_SLAM3::IMU::Point::a)
+    //     .def_readwrite("w", &ORB_SLAM3::IMU::Point::w)
+    //     .def_readwrite("t", &ORB_SLAM3::IMU::Point::t);
 
     py::class_<ORBSLAM3Python>(m, "system")
         .def(py::init<std::string, std::string, ORB_SLAM3::System::eSensor>(), py::arg("vocab_file"), py::arg("settings_file"), py::arg("sensor_type"))
@@ -235,5 +282,6 @@ PYBIND11_MODULE(orbslam3, m)
         .def("get_tracking_state", &ORBSLAM3Python::getTrackingState)
         .def("reset", &ORBSLAM3Python::reset)
         // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
-        .def("get_trajectory", &ORBSLAM3Python::getTrajectory);
+        .def("get_trajectory", &ORBSLAM3Python::getTrajectory)
+        .def("get_current_pose", &ORBSLAM3Python::getCurrentPose);
 }
