@@ -582,7 +582,6 @@ namespace ORB_SLAM3
 
         // Transform all keyframes so that the first keyframe is at the origin.
         // After a loop closure the first keyframe might not be at the origin.
-        // TODO: THIS INDEXES DIRECTLY INTO vpKFs which might be empty!
         Sophus::SE3f Two = vpKFs[0]->GetPoseInverse();
         vector<Eigen::Matrix4f> trajectory;
 
