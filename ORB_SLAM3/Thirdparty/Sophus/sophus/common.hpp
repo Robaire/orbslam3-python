@@ -11,8 +11,11 @@
 #include <type_traits>
 
 // TODO: TESTING
-#define SOPHUS_DISABLE_ENSURES  // THIS IS TO DISABLE ENSURES CAUSING ORBSLAM TO
-                                // CRASH WHEN USING IMU
+#define SOPHUS_DISABLE_ENSURES  // THIS IS TO DISABLE ENSURES CAUSING ORBSLAM
+// Unbelievably, setting SOPHUS_DISABLE_ENSURES causes a bunch of core ORBSLAM
+// modules to fail to compile because they get <iostream> from an import in this
+// file... fantastic code ORBSLAM.
+#include "formatstring.hpp"  // Include this anyway to make sure it's available
 
 #include <Eigen/Core>
 
