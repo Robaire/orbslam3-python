@@ -14,6 +14,7 @@ make -j3
 sudo make install
 
 # Step 3: Install system-level dependencies (for Ubuntu/Debian-based systems) for orb slam
+cd ../..
 sudo apt update
 sudo apt install -y \
     libopencv-dev \
