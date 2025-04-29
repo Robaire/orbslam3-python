@@ -37,6 +37,8 @@ class CMakeBuild(build_ext):
         jobs = os.environ.get("BUILD_JOBS")
         if jobs is not None:
             build_cmd += [f"-j{jobs}"]
+        else:
+            build_cmd += ['-j']
 
         subprocess.check_call(
             build_cmd, cwd=self.build_temp)
