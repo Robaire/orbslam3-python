@@ -31,8 +31,15 @@ class CMakeBuild(build_ext):
 
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
+        
+        build_cmd = ["cmake", "--build", "."]
+
+        jobs = os.environ.get("BUILD_JOBS")
+        if jobs is not None:
+            build_cmd += [f"-j{jobs}"]
+
         subprocess.check_call(
-            ["cmake", "--build", ".", "-j"], cwd=self.build_temp)
+            build_cmd, cwd=self.build_temp)
 
 
 setup(
