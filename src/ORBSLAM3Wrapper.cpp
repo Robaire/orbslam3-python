@@ -197,6 +197,20 @@ int ORBSLAM3Python::getTrackingState()
     }
 }
 
+/// @brief Get the number of tracked key points from the last frame
+/// @return The number of tracked key points
+int ORBSLAM3Python::getTrackedKeyPoints()
+{
+    if (system)
+    {
+        return system->GetTrackedKeyPointsUn().size();
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 void ORBSLAM3Python::setUseViewer(bool useViewer)
 {
     bUseViewer = useViewer;
@@ -280,6 +294,7 @@ PYBIND11_MODULE(orbslam3, m)
         .def("is_lost", &ORBSLAM3Python::isLost)
         .def("map_changed", &ORBSLAM3Python::mapChanged)
         .def("get_tracking_state", &ORBSLAM3Python::getTrackingState)
+        .def("get_tracked_kp_qty", &ORBSLAM3Python::getTrackedKeyPoints)
         .def("reset", &ORBSLAM3Python::reset)
         // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
         .def("get_trajectory", &ORBSLAM3Python::getTrajectory)
