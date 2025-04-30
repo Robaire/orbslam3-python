@@ -23,6 +23,7 @@ public:
     bool isLost();
     bool mapChanged();
     int getTrackingState();
+    int getTrackedKeyPoints();
     void setUseViewer(bool useViewer);
     std::vector<Eigen::Matrix4f> getTrajectory() const;
     pybind11::object getCurrentPose() const;
