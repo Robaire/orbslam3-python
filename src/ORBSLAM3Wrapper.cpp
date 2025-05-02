@@ -177,6 +177,20 @@ void ORBSLAM3Python::shutdown()
     }
 }
 
+/// @brief Check if the system is shut down
+/// @return True if the system is shut down, false otherwise
+bool ORBSLAM3Python::isShutDown()
+{
+    if (system)
+    {
+        return system->isShutDown();
+    }
+    else
+    {
+        return true;
+    }
+}
+
 /// @brief Check if the map has changed
 /// @return True if the map has changed, false otherwise
 bool ORBSLAM3Python::mapChanged()
@@ -290,6 +304,7 @@ PYBIND11_MODULE(orbslam3, m)
         .def("process_image_stereo", &ORBSLAM3Python::processStereo, py::arg("left_image"), py::arg("right_image"), py::arg("time_stamp"))
         .def("process_image_stereo_imu", &ORBSLAM3Python::processStereoIMU, py::arg("left_image"), py::arg("right_image"), py::arg("time_stamp"), py::arg("imu_data"))
         .def("shutdown", &ORBSLAM3Python::shutdown)
+        .def("is_shutdown", &ORBSLAM3Python::isShutDown)
         .def("is_running", &ORBSLAM3Python::isRunning)
         .def("is_lost", &ORBSLAM3Python::isLost)
         .def("map_changed", &ORBSLAM3Python::mapChanged)

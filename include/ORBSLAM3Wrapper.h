@@ -19,6 +19,7 @@ public:
     pybind11::object processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<std::vector<float>> imuData);
     void reset();
     void shutdown();
+    bool isShutDown();
     bool isRunning();
     bool isLost();
     bool mapChanged();
