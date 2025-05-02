@@ -37,6 +37,7 @@ ORBSLAM3Python::~ORBSLAM3Python() {}
 /// @return True if the system was initialized successfully, false otherwise
 bool ORBSLAM3Python::initialize()
 {
+    py::gil_scoped_release release;
     system = std::make_shared<ORB_SLAM3::System>(vocabluaryFile, settingsFile, sensorMode, bUseViewer);
     return true;
 }
@@ -60,6 +61,8 @@ void ORBSLAM3Python::reset()
 /// @return The pose of the camera
 py::object ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
 {
+    py::gil_scoped_acquire acquire;
+
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
@@ -85,6 +88,8 @@ py::object ORBSLAM3Python::processMono(cv::Mat image, double timestamp)
 /// @return The pose of the camera
 py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, double timestamp)
 {
+    py::gil_scoped_acquire acquire;
+
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
@@ -111,6 +116,8 @@ py::object ORBSLAM3Python::processStereo(cv::Mat leftImage, cv::Mat rightImage, 
 /// @return The pose of the camera
 py::object ORBSLAM3Python::processStereoIMU(cv::Mat leftImage, cv::Mat rightImage, double timestamp, std::vector<std::vector<float>> imuData)
 {
+    py::gil_scoped_acquire acquire;
+
     if (!system)
     {
         std::cout << "you must call initialize() first!" << std::endl;
@@ -235,6 +242,8 @@ void ORBSLAM3Python::setUseViewer(bool useViewer)
 /// @note This seems to cause a segfault if orbslam loses tracking
 std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
 {
+    py::gil_scoped_acquire acquire;
+
     if (system)
     {
         // TODO: Fix this
@@ -251,6 +260,8 @@ std::vector<Eigen::Matrix4f> ORBSLAM3Python::getTrajectory() const
 /// @return The current camera pose
 py::object ORBSLAM3Python::getCurrentPose() const
 {
+    py::gil_scoped_acquire acquire;
+
     if (system)
     {
         std::vector<Eigen::Matrix4f> trajectory = system->GetCameraTrajectory();
