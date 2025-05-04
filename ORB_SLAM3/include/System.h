@@ -143,6 +143,9 @@ public:
     // Extract camera trajectory from the system
     std::vector<Eigen::Matrix4f> GetCameraTrajectory();
 
+    // Extract all map points from the system
+    std::vector<Eigen::Vector3f> GetMapPoints();
+
     // Save camera trajectory in the TUM RGB-D dataset format.
     // Only for stereo and RGB-D. This method does not work for monocular.
     // Call first Shutdown()

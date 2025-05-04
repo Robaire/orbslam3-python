@@ -28,6 +28,7 @@ public:
     void setUseViewer(bool useViewer);
     std::vector<Eigen::Matrix4f> getTrajectory() const;
     pybind11::object getCurrentPose() const;
+    std::vector<Eigen::Vector3f> getMapPoints() const;
 
 private:
     std::string vocabluaryFile;

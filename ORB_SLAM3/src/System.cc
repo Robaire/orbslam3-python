@@ -622,6 +622,29 @@ namespace ORB_SLAM3
         return trajectory;
     }
 
+    vector<Eigen::Vector3f> System::GetMapPoints()
+    {
+        vector<Eigen::Vector3f> vPoints;
+        
+        // Get the active map and make sure it has been initialized
+        Map* pActiveMap = mpAtlas->GetCurrentMap();
+        if(!pActiveMap)
+            return vPoints;
+
+        // Get all map points
+        const vector<MapPoint*>& vpMPs = pActiveMap->GetAllMapPoints();
+
+        // Accumulate good points into the output vector
+        for(auto pMP : vpMPs)
+        {
+            if(pMP->isBad())
+                continue;
+            vPoints.push_back(pMP->GetWorldPos());
+        }
+        
+        return vPoints;
+    }
+
     void System::SaveTrajectoryTUM(const string &filename)
     {
         cout << endl

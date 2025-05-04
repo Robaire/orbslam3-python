@@ -277,6 +277,22 @@ py::object ORBSLAM3Python::getCurrentPose() const
     }
 }
 
+/// @brief Get all current map points in the orbslam world frame
+/// @return A vector of 3D points of ORB features
+std::vector<Eigen::Vector3f> ORBSLAM3Python::getMapPoints() const
+{
+    py::gil_scoped_acquire acquire;
+
+    if (system)
+    {
+        return system->GetMapPoints();
+    }
+    else
+    {
+        return std::vector<Eigen::Vector3f>();
+    }
+}
+
 PYBIND11_MODULE(orbslam3, m)
 {
     NDArrayConverter::init_numpy();
@@ -324,5 +340,6 @@ PYBIND11_MODULE(orbslam3, m)
         .def("reset", &ORBSLAM3Python::reset)
         // .def("set_use_viewer", &ORBSLAM3Python::setUseViewer)
         .def("get_trajectory", &ORBSLAM3Python::getTrajectory)
-        .def("get_current_pose", &ORBSLAM3Python::getCurrentPose);
+        .def("get_current_pose", &ORBSLAM3Python::getCurrentPose)
+        .def("get_map_points", &ORBSLAM3Python::getMapPoints);
 }
